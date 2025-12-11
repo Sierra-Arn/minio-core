@@ -1,0 +1,21 @@
+[workspace]
+authors = ["Sierra Arn"]
+channels = ["conda-forge"]
+name = "minio-core"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "*"
+pydantic-settings = "*"
+boto3 = "*"
+aioboto3 = "*"
+just = "*"
+
+[feature.test.dependencies]
+ipykernel = "*"
+
+[environments]
+test = ["test"]
