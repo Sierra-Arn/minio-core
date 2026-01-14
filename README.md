@@ -19,25 +19,25 @@ Each directory includes its own `README.md` with detailed information about its 
 
 ## **Dependencies Overview**
 
-- [pydantic-settings](https://github.com/pydantic/pydantic-settings) —  
-A Pydantic-powered library for managing application configuration and environment variables with strong typing, validation, and seamless `.env` support.
+- [pydantic-settings](https://github.com/pydantic/pydantic-settings) — 
+a Pydantic-powered library for managing application configuration and environment variables with strong typing, validation, and seamless `.env` support.
 
-- [boto3](https://github.com/boto/boto3) —  
-A synchronous Python client for Amazon S3 and other AWS services; compatible with S3-compatible storage systems, including MinIO. [^1]
+- [boto3](https://github.com/boto/boto3) — 
+a synchronous Python client for Amazon S3 and other AWS services; compatible with S3-compatible storage systems, including MinIO. [^1]
 
-- [aioboto3](https://github.com/terricain/aioboto3) —  
+- [aioboto3](https://github.com/terricain/aioboto3) — 
 An asynchronous Python client for Amazon S3 and other AWS services; compatible with S3-compatible storage systems, including MinIO. [^1]
 
 [^1]: I chose `boto3` over `minio-py` because the latter is synchronous-only, and MinIO doesn’t provide an official async client. On the other hand, `aioboto3`— built on top of `boto3` and `aiobotocore`— offers an async client with a nearly identical API. Since this is an educational project, I wanted to keep the codebase consistent and avoid using two entirely different libraries for sync and async operations.
 
-- [just](https://github.com/casey/just) —  
-A lightweight, cross-platform command runner that replaces complex shell scripts with clean, readable, and reusable project-specific recipes. [^2]
+- [just](https://github.com/casey/just) — 
+a lightweight, cross-platform command runner that replaces complex shell scripts with clean, readable, and reusable project-specific recipes. [^2]
 
 [^2]: Despite using `pixi`, there are issues with `pixi tasks` regarding environment variable handling from `.env` files and caching mechanism that is unclear and causes numerous errors. In contrast, `just` provides predictable, transparent execution without the complications encountered with `pixi tasks` system. I truly hope `pixi tasks` have been improved by the time you’re reading this! <33
 
 ### **Testing & Development Dependencies**
-- [ipykernel](https://github.com/ipython/ipykernel) —  
-The IPython kernel for Jupyter, enabling interactive notebook development and seamless integration with the project’s virtual environments.
+- [ipykernel](https://github.com/ipython/ipykernel) — 
+the IPython kernel for Jupyter, enabling interactive notebook development and seamless integration with the project’s virtual environments.
 
 ## **Quick Start**
 
