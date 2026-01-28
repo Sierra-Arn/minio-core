@@ -24,6 +24,7 @@ def validate_clean_string(value: str, field_name: str = "Value") -> str:
     ValueError
         If the string is empty, blank, or has leading/trailing whitespace.
     """
+    
     if not value:
         raise ValueError(f"{field_name} cannot be empty")
     if not value.strip():

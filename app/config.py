@@ -14,14 +14,28 @@ class MinIOConfig(BaseSettings):
     external_port : int
         TCP port the server listens on. Must be in the range 1-65535.
         Default is `9000` (standard MinIO port).
-    bucket_images_name : str
-        Name of the MinIO bucket designated for storing image files.
-    bucket_documents_name : str
-        Name of the MinIO bucket designated for storing document files.
     root_username : str
         MinIO root username (acts as AWS access key).
     root_password : str
         MinIO root password (acts as AWS secret key).
+    images_bucket_name : str
+        Name of the MinIO bucket designated for storing image files.
+    images_max_file_size : int
+        Maximum allowed file size (in bytes) for uploads to the images bucket.
+    images_allowed_mime_types : list[str]
+        list of allowed MIME types for image uploads.
+    images_expiration_days : int | None
+        Number of days after which objects in the images bucket are considered expired.
+        If `None`, objects are retained indefinitely.
+    documents_bucket_name : str
+        Name of the MinIO bucket designated for storing document files.
+    documents_max_file_size : int
+        Maximum allowed file size (in bytes) for uploads to the documents bucket.
+    documents_allowed_mime_types : list[str]
+        list of allowed MIME types for document uploads.
+    documents_expiration_days : int | None
+        Number of days after which objects in the documents bucket are considered expired.
+        If `None`, objects are retained indefinitely.
 
     Notes:
     ------
@@ -51,10 +65,20 @@ class MinIOConfig(BaseSettings):
 
     host: str = "127.0.0.1"
     external_port: int = Field(9000, ge=1, le=65535)
-    bucket_images_name: str
-    bucket_documents_name: str
     root_username: str
     root_password: str
+
+    # Images bucket settings
+    images_bucket_name: str
+    images_max_file_size: int = Field(..., gt=0)
+    images_allowed_mime_types: list[str] = Field(..., min_length=1)
+    images_expiration_days: int | None = Field(None, gt=0)
+
+    # Documents bucket settings
+    documents_bucket_name: str
+    documents_max_file_size: int = Field(..., gt=0)
+    documents_allowed_mime_types: list[str] = Field(..., min_length=1)
+    documents_expiration_days: int | None = Field(None, gt=0)
 
     @property
     def connection_url(self) -> str:

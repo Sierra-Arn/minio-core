@@ -47,10 +47,6 @@ class UploadFileRequest(BaseModel):
                 {
                     "storage_key": "critique-of-pure-reason.pdf",
                     "file_path": "./downloads/kant-philosophy.pdf"
-                },
-                {
-                    "storage_key": "cute-cat.png",
-                    "file_path": "/tmp/rickroll.png"
                 }
             ]
         }

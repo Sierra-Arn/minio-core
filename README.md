@@ -39,6 +39,9 @@ a lightweight, cross-platform command runner that replaces complex shell scripts
 - [ipykernel](https://github.com/ipython/ipykernel) — 
 the IPython kernel for Jupyter, enabling interactive notebook development and seamless integration with the project’s virtual environments.
 
+- [requests](https://github.com/psf/requests) — 
+a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.1 requests; used here to test S3 presigned URL functionality directly from Python code without relying on external tools like `curl`.
+
 ## **Quick Start**
 
 ### **I. Prerequisites**
@@ -86,8 +89,8 @@ the IPython kernel for Jupyter, enabling interactive notebook development and se
 
 Once a storage is ready, you can run and test the MinIO implementation with interactive Jupyter notebooks in `playground-testing/`.
 
-> **Note:**
-> Before running the notebooks, ensure that the `playground-testing/assets/` directory contains a couple of sample files. Any file type is acceptable — content and MIME type validation were intentionally omitted, as they are beyond the scope of this educational project.
+> **Note:**  
+> Before running the notebooks, ensure that the `playground-testing/assets/` directory contains a couple of sample files with MIME types that match those specified in the `.env` file.
 
 ### **IV. Cleanup**
 

@@ -3,7 +3,7 @@ authors = ["Sierra Arn"]
 channels = ["conda-forge"]
 name = "minio-core"
 platforms = ["linux-64"]
-version = "0.1.0"
+version = "0.2.0"
 
 [tasks]
 
@@ -16,6 +16,7 @@ just = "*"
 
 [feature.test.dependencies]
 ipykernel = "*"
+requests = "*"
 
 [environments]
 test = ["test"]

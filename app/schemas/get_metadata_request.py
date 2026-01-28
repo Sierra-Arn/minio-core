@@ -1,11 +1,11 @@
-# app/schemas/delete_request.py
+# app/schemas/get_metadata_request.py
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from .utils import validate_clean_string
 
 
-class DeleteFileRequest(BaseModel):
+class GetFileMetadataRequest(BaseModel):
     """
-    Request schema for deleting an object from an S3-compatible object storage bucket via the REST API.
+    Request schema for retrieving metadata about an object from an S3-compatible object storage bucket via the REST API.
     The bucket is determined by the service configuration, not by the request.
     """
 
@@ -13,7 +13,7 @@ class DeleteFileRequest(BaseModel):
         ...,
         min_length=1,
         description=(
-            "Name of the object to delete from the bucket. Must be at least 1 character long and not blank."
+            "Name of the object in the bucket whose metadata is to be retrieved. Must be at least one character long and not blank."
         )
     )
 

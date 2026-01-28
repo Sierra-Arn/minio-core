@@ -10,24 +10,32 @@
 2. **`schemas/`**  
    Contains Pydantic models that validate and structure incoming data before it is persisted to the object storage, ensuring data integrity and type safety.
 
-3. **`sync_storage//`**  
+3. **`utils.py`**  
+   Provides core utilities for interacting with MinIO storage:
+   - **Client creation**:  
+   Functions to obtain synchronous (`get_client`) and asynchronous (`get_async_client`) S3-compatible clients.
+   - **Bucket initialization**:  
+   Creates buckets if they don't exist (`create_bucket_if_not_exists`).
+   - **Lifecycle management**:  
+   Configures automatic object expiration policies (`setup_lifecycle`) based on retention settings.
+
+4. **`sync_client.py`**  
    Synchronous data access layer.
 
-4. **`async_storage//`**  
+5. **`async_client.py`**  
    Asynchronous data access layer.
 
-## **II. `sync_storage/` and `async_storage/` — Dual Data Access Layers**
+## **II. `sync_client.py` and `async_client.py` — Dual Data Access Layers**
 
-These directories provide **symmetrical implementations** of the same data access patterns — one for synchronous execution (`sync_storage/`), and the other for asynchronous (`async_storage/`). Both follow identical architectural boundaries but differ only in I/O model, enabling consistent logic across blocking and non-blocking contexts.
+Both modules provide the same API through `ObjectStorageClient` class, differing only in their execution model (synchronous vs. asynchronous). The client encapsulates all S3-compatible storage operations for a single bucket:
 
-1. **`client.py`**  
-   Provides a context-managed, bucket-aware MinIO (S3-compatible) client factory — synchronous or asynchronous — that guarantees:
-   - Safe client instantiation using centralized MinIO credentials and endpoint,
-   - Proper resource cleanup (e.g., closing async HTTP connections),
-   - Isolation of storage client per operation, with no shared state.
+- **Lifecycle management**:  
+Automatically creates the bucket and configures expiration policies on initialization.
+- **File operations**:  
+Upload, download, delete, and retrieve metadata for objects.
+- **Presigned URLs**:  
+Generate temporary URLs for direct client-side uploads (`PUT`) and downloads (`GET`), bypassing the application server.
+- **Validation**:  
+Enforces file size limits and MIME type restrictions before operations.
 
-2. **`utils.py`**  
-   Exposes one-time setup routines, such as bucket creation, using the configured storage client. Intended for initialization.
-
-3. **`service.py`**  
-   Encapsulates all file operations (upload, download, delete, metadata, listing) for a fixed bucket. Accepts pre-validated Pydantic requests and delegates to the storage client, ensuring consistent, reusable, and testable data access logic.
+Each module instantiates singleton clients for predefined buckets (e.g., `documents_storage_client`, `images_storage_client`) at module level, ensuring bucket initialization happens once during application startup. The async version uses `aioboto3` with proper `async with` context management, while the sync version uses standard `boto3`.
