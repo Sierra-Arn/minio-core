@@ -36,8 +36,9 @@ a lightweight, cross-platform command runner that replaces complex shell scripts
 [^2]: Despite using `pixi`, there are issues with `pixi tasks` regarding environment variable handling from `.env` files and caching mechanism that is unclear and causes numerous errors. In contrast, `just` provides predictable, transparent execution without the complications encountered with `pixi tasks` system. I truly hope `pixi tasks` have been improved by the time you’re reading this! <33
 
 ### **Testing & Development Dependencies**
-- [ipykernel](https://github.com/ipython/ipykernel) — 
-the IPython kernel for Jupyter, enabling interactive notebook development and seamless integration with the project’s virtual environments.
+
+- [JupyterLab](https://github.com/jupyterlab/jupyterlab) — 
+a next-generation web-based interactive development environment for Jupyter notebooks; used here to create interactive documents for testing and verifying code execution.
 
 - [requests](https://github.com/psf/requests) — 
 a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.1 requests; used here to test S3 presigned URL functionality directly from Python code without relying on external tools like `curl`.
@@ -87,16 +88,34 @@ a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.
 
 ### **III. Testing**
 
-Once a storage is ready, you can run and test the MinIO implementation with interactive Jupyter notebooks in `playground-testing/`.
+Once a storage is ready, you can run and test the MinIO implementation with interactive Jupyter notebooks in `playground-testing/`:
 
 > **Note:**  
-> Before running the notebooks, ensure that the `playground-testing/assets/` directory contains a couple of sample files with MIME types that match those specified in the `.env` file.
+> Ensure the `playground-testing/assets/` directory contains test files with MIME types matching those specified in the `.env` file before running the notebooks.
+
+1. **Launch JupyterLab**
+
+    ```bash
+    pixi run -e test jupyter lab
+    ```
+
+2. **Test the MinIO implementation**
+    - JupyterLab should open automatically in your browser at the default address.
+    - In JupyterLab, navigate to the `playground-testing/` folder.
+    - Open and execute the notebooks interactively.
 
 ### **IV. Cleanup**
 
-```bash
-just minio-down-1
-```
+When you finish testing:
+
+1. **Stop JupyterLab**  
+   In the terminal where JupyterLab is running, press `Ctrl+C` to shut it down
+
+2. **Stop MinIO**
+
+    ```bash
+    just minio-down-1
+    ```
 
 ## **License**
 

@@ -3,7 +3,7 @@ authors = ["Sierra Arn"]
 channels = ["conda-forge"]
 name = "minio-core"
 platforms = ["linux-64"]
-version = "0.2.0"
+version = "0.2.1"
 
 [tasks]
 
@@ -15,7 +15,7 @@ aioboto3 = "*"
 just = "*"
 
 [feature.test.dependencies]
-ipykernel = "*"
+jupyterlab = "*"
 requests = "*"
 
 [environments]

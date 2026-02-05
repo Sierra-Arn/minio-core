@@ -10,3 +10,6 @@ __pycache__/
 
 # MinIO-specific files
 minio-data/
+
+# Jupyter-generated files
+.ipynb_checkpoints/
