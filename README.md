@@ -59,7 +59,7 @@ a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.
 1. **Clone the repository**
 
     ```bash
-    git clone https://github.com/Sierra-Arn/minio-core.git
+    git clone git@github.com:Sierra-Arn/minio-core.git
     cd minio-core
     ```
 
