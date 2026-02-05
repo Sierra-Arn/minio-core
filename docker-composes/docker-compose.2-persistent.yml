@@ -13,7 +13,6 @@ services:
     command: server /data
     volumes:
       # Mounting volume for persistent MinIO object storage data
-      # Volume minio-data will be created automatically on first run
       # MinIO stores all object data, metadata, and configuration in the /data directory
       # Objects are immediately written to disk upon successful upload completion
       #
@@ -24,12 +23,19 @@ services:
       # Maps a host directory directly to the container's /data directory
       # Data is stored at the path specified by MINIO_DATA_PATH on the host machine
       # Provides direct access to files from the host filesystem
-      - ${MINIO_DATA_PATH}:/data
+      - ../${MINIO_DATA_PATH}:/data
       # =====================================================
       # Option 2: Named Volume (alternative approach)
-      # Uses Docker-managed storage with a named volume
-      # Comment out the bind mount above and uncomment the volumes section 
-      # at the bottom of this file to use this approach
+      # Uses Docker-managed storage with a named volume for better isolation and portability
+      # Docker manages the storage location (typically /var/lib/docker/volumes/) instead of
+      # using a direct path on the host filesystem
+      # This is NOT a bind mount - Docker controls where and how data is stored
+      # 
+      # To use this approach:
+      # 1. Comment out the bind mount line above
+      # 2. Uncomment the volumes section at the bottom of this file
+      # 3. Uncomment the line below
+      # - minio-data:/data
       # =====================================================
 
 # =====================================================

@@ -109,7 +109,7 @@ Once a storage is ready, you can run and test the MinIO implementation with inte
 When you finish testing:
 
 1. **Stop JupyterLab**  
-   In the terminal where JupyterLab is running, press `Ctrl+C` to shut it down
+   In the terminal where JupyterLab is running, press `Ctrl+C` to shut it down.
 
 2. **Stop MinIO**
 
