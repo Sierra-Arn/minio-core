@@ -83,7 +83,7 @@ a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.
 
 5. **Start MinIO**
    ```bash
-   just minio-up-1
+   just minio-up 1
    ```
 
 ### **III. Testing**
@@ -114,7 +114,7 @@ When you finish testing:
 2. **Stop MinIO**
 
     ```bash
-    just minio-down-1
+    just minio-down 1
     ```
 
 ## **License**
