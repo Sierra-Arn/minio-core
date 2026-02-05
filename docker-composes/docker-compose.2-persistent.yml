@@ -11,20 +11,34 @@ services:
     ports:
       - "${MINIO_EXTERNAL_PORT}:${MINIO_INTERNAL_PORT}"
     command: server /data
-
     volumes:
-      # Mounting named volume for persistent MinIO object storage data
+      # Mounting volume for persistent MinIO object storage data
       # Volume minio-data will be created automatically on first run
       # MinIO stores all object data, metadata, and configuration in the /data directory
       # Objects are immediately written to disk upon successful upload completion
+      #
+      # There are two approaches to persist MinIO data:
+      # (Both approaches ensure data persists across container restarts and removals)
+      # =====================================================
+      # Option 1: Bind Mount (currently active)
+      # Maps a host directory directly to the container's /data directory
+      # Data is stored at the path specified by MINIO_DATA_PATH on the host machine
+      # Provides direct access to files from the host filesystem
       - ${MINIO_DATA_PATH}:/data
+      # =====================================================
+      # Option 2: Named Volume (alternative approach)
+      # Uses Docker-managed storage with a named volume
+      # Comment out the bind mount above and uncomment the volumes section 
+      # at the bottom of this file to use this approach
+      # =====================================================
 
 # =====================================================
 # Volumes Configuration
+# Uncomment this section if using named volumes instead of bind mounts
 # =====================================================
-volumes:
-  minio-data:
-    # Using local driver to store data on the host machine
-    driver: local
-    # Data will persist even after container removal
-    # On docker-compose restart, data will be restored automatically
+# volumes:
+#   minio-data:
+#     # Using local driver to store data on the host machine
+#     driver: local
+#     # Data will persist even after container removal
+#     # On docker-compose restart, data will be restored automatically
