@@ -1,11 +1,22 @@
 # app/utils.py
+
+"""
+S3-compatible object storage utilities for MinIO.
+
+Provides client factories for synchronous and asynchronous boto3 connections,
+and storage initialization functions (bucket creation and lifecycle configuration).
+
+Can be run directly to create the bucket and setup lifecycle configuration:
+
+    python -m app.utils
+"""
+
 import boto3
-from botocore.exceptions import ClientError
 import aioboto3
 from .config import minio_config
 
 
-def get_client() -> boto3.client:
+def get_sync_client() -> boto3.client:
     """
     Create and return a new S3-compatible boto3 client.
 
@@ -27,8 +38,13 @@ def get_client() -> boto3.client:
 
     Notes
     -----
-    boto3 clients are dynamically created, so static type checkers may not recognize
+    - boto3 clients are dynamically created, so static type checkers may not recognize
     their methods. This is expected and safe to ignore.
+
+    - Unlike database connections where sharing a connection across multiple operations
+    executes them within the same session or transaction, each S3 API call is always
+    an independent HTTP request regardless of whether the same client instance is reused.
+    Therefore, creating a fresh client per operation has no practical downside.
     """
     
     return boto3.client(
@@ -42,90 +58,22 @@ def get_client() -> boto3.client:
     )
 
 
-def create_bucket_if_not_exists(bucket_name: str) -> None:
-    """
-    Create the bucket if it doesn't already exist.
-
-    Parameters
-    ----------
-    bucket_name : str
-        The name of the S3 bucket to create.
-
-    Raises
-    ------
-    ClientError
-        If bucket creation fails due to permissions, invalid name, or other errors
-        (excluding BucketAlreadyExists and BucketAlreadyOwnedByYou).
-    """
-    
-    try:
-        client = get_client()
-        client.create_bucket(Bucket=bucket_name)
-        print(f"Bucket '{bucket_name}' created successfully.")
-    except ClientError as e:
-        error_code = e.response.get('Error', {}).get('Code')
-        if error_code in ('BucketAlreadyOwnedByYou', 'BucketAlreadyExists'):
-            print(f"Bucket '{bucket_name}' already exists.")
-        else:
-            print(f"Failed to create bucket '{bucket_name}': {e}")
-            raise
-
-
-def setup_lifecycle(bucket_name: str, expiration_days: int) -> None:
-    """
-    Configure automatic object expiration based on the expiration_days setting.
-
-    Parameters
-    ----------
-    bucket_name : str
-        The name of the S3 bucket to configure lifecycle rules for.
-    expiration_days : int
-        The number of days after which objects in the bucket will automatically expire
-        and be deleted.
-
-    Raises
-    ------
-    ClientError
-        If lifecycle configuration fails.
-    """
-
-    client = get_client()
-    client.put_bucket_lifecycle_configuration(
-        Bucket=bucket_name,
-        LifecycleConfiguration={
-            'Rules': [
-                {
-                    'ID': f'auto-delete-after-{expiration_days}-days',
-                    'Status': 'Enabled',
-                    'Expiration': {
-                        'Days': expiration_days
-                    },
-                    'Filter': {
-                        'Prefix': ''
-                    }
-                }
-            ]
-        }
-    )
-
-
 def get_async_client() -> aioboto3.Session.client:
     """
     Create and return a new asynchronous S3-compatible aioboto3 client context manager.
 
-    Unlike the synchronous boto3 client which is stateless and doesn't require explicit cleanup,
-    aioboto3 clients are asynchronous context managers that:
-        - Manage async HTTP connections: Must be properly entered/exited to handle aiohttp sessions.
-        - Require explicit lifecycle: Need `async with` to ensure proper connection cleanup.
-        - Handle connection pooling: Internal aiohttp ClientSession must be closed to release sockets.
-        - Prevent resource leaks: Without proper context management, connections remain open.
+    aioboto3 is an async wrapper over botocore — S3 semantics are identical to the
+    synchronous client. Each API call is always an independent HTTP request regardless
+    of whether the same client instance is reused. Therefore, creating a fresh client
+    per operation has no practical downside.
 
-    Therefore, this function returns a context manager that MUST be used with `async with`:
+    Unlike the synchronous boto3 client however, aioboto3 uses aiohttp instead of urllib3
+    for HTTP transport, which requires explicit lifecycle management. This function MUST
+    be used with `async with` to ensure the underlying aiohttp session is properly
+    initialized on entry and closed on exit, preventing connection leaks:
+
         async with get_async_client() as client:
             await client.list_buckets()
-
-    This ensures the underlying aiohttp session is properly initialized on entry and gracefully
-    closed on exit, preventing connection leaks and resource exhaustion.
 
     Returns
     -------
@@ -149,3 +97,55 @@ def get_async_client() -> aioboto3.Session.client:
         use_ssl=False,
         verify=False,
     )
+
+
+def create_bucket() -> None:
+    """
+    Create a bucket.
+
+    Raises
+    ------
+    ClientError
+        If bucket creation fails.
+    """
+
+    client = get_sync_client()
+    client.create_bucket(Bucket=minio_config.bucket_name)
+
+
+def setup_lifecycle() -> None:
+    """
+    Configure automatic expiration for objects under the temp prefix.
+
+    Objects stored under `temp_prefix` are automatically deleted
+    after `temp_expiration_days` days.
+
+    Raises
+    ------
+    ClientError
+        If lifecycle configuration fails.
+    """
+
+    client = get_sync_client()
+    client.put_bucket_lifecycle_configuration(
+        Bucket=minio_config.bucket_name,
+        LifecycleConfiguration={
+            'Rules': [
+                {
+                    'ID': f'auto-delete-after-{minio_config.temp_expiration_days}-days',
+                    'Status': 'Enabled',
+                    'Expiration': {
+                        'Days': minio_config.temp_expiration_days
+                    },
+                    'Filter': {
+                        'Prefix': minio_config.temp_prefix
+                    }
+                }
+            ]
+        }
+    )
+
+
+if __name__ == "__main__":
+    create_bucket()
+    setup_lifecycle()

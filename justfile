@@ -21,6 +21,15 @@ copy-env:
     cp .env.example .env
     
 
+# =====================================================
+# Storage Initialization
+# =====================================================
+# Initialize S3-compatible storage bucket and lifecycle policies
+# Run once before starting the application for the first time
+init-bucket:
+    python -m app.utils
+
+
 # =====================================================  
 # MinIO Persistent Storage Management  
 # =====================================================  

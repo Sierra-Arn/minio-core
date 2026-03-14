@@ -18,24 +18,15 @@ class MinIOConfig(BaseSettings):
         MinIO root username (acts as AWS access key).
     root_password : str
         MinIO root password (acts as AWS secret key).
-    images_bucket_name : str
-        Name of the MinIO bucket designated for storing image files.
-    images_max_file_size : int
-        Maximum allowed file size (in bytes) for uploads to the images bucket.
-    images_allowed_mime_types : list[str]
-        list of allowed MIME types for image uploads.
-    images_expiration_days : int | None
-        Number of days after which objects in the images bucket are considered expired.
-        If `None`, objects are retained indefinitely.
-    documents_bucket_name : str
-        Name of the MinIO bucket designated for storing document files.
-    documents_max_file_size : int
-        Maximum allowed file size (in bytes) for uploads to the documents bucket.
-    documents_allowed_mime_types : list[str]
-        list of allowed MIME types for document uploads.
-    documents_expiration_days : int | None
-        Number of days after which objects in the documents bucket are considered expired.
-        If `None`, objects are retained indefinitely.
+    bucket_name : str
+        Name of the MinIO bucket designated for storing files.
+    temp_prefix : str
+        Prefix for temporary files. Default is `"temp/"`.
+    permanent_prefix : str
+        Prefix for permanent files. Default is `"permanent/"`.
+    temp_expiration_days : int
+        Number of days after which objects under temp_prefix are automatically deleted.
+        Default is `1`.
 
     Notes:
     ------
@@ -67,18 +58,10 @@ class MinIOConfig(BaseSettings):
     external_port: int = Field(9000, ge=1, le=65535)
     root_username: str
     root_password: str
-
-    # Images bucket settings
-    images_bucket_name: str
-    images_max_file_size: int = Field(..., gt=0)
-    images_allowed_mime_types: list[str] = Field(..., min_length=1)
-    images_expiration_days: int | None = Field(None, gt=0)
-
-    # Documents bucket settings
-    documents_bucket_name: str
-    documents_max_file_size: int = Field(..., gt=0)
-    documents_allowed_mime_types: list[str] = Field(..., min_length=1)
-    documents_expiration_days: int | None = Field(None, gt=0)
+    bucket_name: str
+    temp_prefix: str = "temp/"
+    permanent_prefix: str = "permanent/"
+    temp_expiration_days: int = Field(1, ge=1)
 
     @property
     def connection_url(self) -> str:
@@ -90,13 +73,7 @@ class MinIOConfig(BaseSettings):
         str
             Complete MinIO connection URL in the format: http://host:port
         """
-
         return f"http://{self.host}:{self.external_port}"
 
 
-# Initialize MinIO configuration singleton
-# Since MinIO storage settings are static for the application's lifetime
-# and any changes require a restart to take effect,
-# it is safe and efficient to instantiate this configuration once at module level
-# and reuse it throughout the application as a singleton.
 minio_config = MinIOConfig()

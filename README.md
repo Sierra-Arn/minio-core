@@ -77,13 +77,21 @@ a simple, yet powerful HTTP client for Python that makes it easy to send HTTP/1.
     ```
 
 4. **Setup environment configuration**
+
    ```bash
    just copy-env
    ```
 
 5. **Start MinIO**
+
    ```bash
    just minio-up 1
+   ```
+
+6. **Initialize bucket**
+
+   ```bash
+   just init-bucket
    ```
 
 ### **III. Testing**

@@ -1,7 +1,5 @@
 # app/schemas/upload_request.py
-import os
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-from .utils import validate_clean_string
+from pydantic import BaseModel, Field, field_validator, ConfigDict, ValidationInfo
 
 
 class UploadFileRequest(BaseModel):
@@ -13,31 +11,28 @@ class UploadFileRequest(BaseModel):
     storage_key: str = Field(
         ...,
         min_length=1,
-        description=(
-            "Name to assign to the uploaded object in the bucket. Must be at least 1 character long and not blank."
-        )
+        description="Name to assign to the uploaded object in the bucket. Must be at least 1 character long and not blank."
     )
 
     file_path: str = Field(
         ...,
         min_length=1,
-        description=(
-            "Local filesystem path to the file to be uploaded. Must point to an existing regular file."
-        )
+        description="Local filesystem path to the file to be uploaded."
     )
 
     @field_validator("storage_key", "file_path")
     @classmethod
-    def attributes_clean_string(cls, v: str) -> str:
-        """Validate that string fields are non-empty, non-blank and has no leading/trailing whitespace."""
-        return validate_clean_string(v, "Name")
+    def validate_clean_string(cls, v: str, info: ValidationInfo) -> str:
+        """Validate that string fields are non-empty, non-blank and have no leading/trailing whitespace."""
+        field_name = info.field_name
 
-    @field_validator("file_path")
-    @classmethod
-    def file_path_exists(cls, v: str) -> str:
-        """Validate that the specified file path corresponds to an existing file on disk."""
-        if not os.path.isfile(v):
-            raise ValueError(f"File not found: {v}")
+        if not v:
+            raise ValueError(f"{field_name} cannot be empty")
+        if not v.strip():
+            raise ValueError(f"{field_name} cannot be blank")
+        if v != v.strip():
+            raise ValueError(f"{field_name} must not have leading or trailing whitespace")
+
         return v
 
     model_config = ConfigDict(
