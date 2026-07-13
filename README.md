@@ -2,6 +2,9 @@
 
 *An educational project showcasing how to use MinIO with Python, covering both synchronous and asynchronous approaches.*
 
+> ⚠️ **This repository is archived.**  
+> This project originally served as an early sandbox for exploring MinIO — a place to experiment before integrating the technology into something more substantial. As more serious educational projects took shape — each applying increasingly refined approaches — maintaining duplicate MinIO code here lost its purpose. For a more complete and representative implementation, refer to [Human Pose Estimation Service](https://github.com/Sierra-Arn/pose-estimation-service).
+
 ## **Project Structure**
 
 ```bash
